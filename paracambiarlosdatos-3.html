@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario - Depósito</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .fungicidas { border-left-color: #e74c3c; }
+        .insecticidas { border-left-color: #f39c12; }
+        .herbicidas { border-left-color: #27ae60; }
+        .aceites { border-left-color: #9b59b6; }
+        .foliares { border-left-color: #3498db; }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .fungicidas .category-icon { background: #e74c3c; }
+        .insecticidas .category-icon { background: #f39c12; }
+        .herbicidas .category-icon { background: #27ae60; }
+        .aceites .category-icon { background: #9b59b6; }
+        .foliares .category-icon { background: #3498db; }
+
+        .category-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .space-info {
+            margin-bottom: 20px;
+        }
+
+        .space-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .space-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .capacity-info {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-update:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .status-high { background: #d5f4e6; color: #27ae60; }
+        .status-medium { background: #fef9e7; color: #f39c12; }
+        .status-low { background: #fadbd8; color: #e74c3c; }
+
+        .last-updated {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .edit-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+ <body>
+    <div class="container">
+      <div class="header">
+        <h1>🏭 Sistema de Inventario</h1>
+        <p>Gestión de Espacio en Depósito</p>
+      </div>
+
+      <div class="inventory-grid" id="inventoryGrid">
+        <!-- Las tarjetas se generarán dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Código JavaScript como módulo -->
+    <script type="module">
+      // Importa los módulos necesarios de Firebase (incluyendo Realtime Database)
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
+      import { getDatabase, ref, set, update, get } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+      
+      // Inicializar Firebase, Analytics y Realtime Database
+      const firebaseConfig = {
+        apiKey: "AIzaSyCODzFUSe34wHq8-m5taiFjKyEKfg5uZuU",
+        authDomain: "espaciodeposito.firebaseapp.com",
+        projectId: "espaciodeposito",
+        storageBucket: "espaciodeposito.firebasestorage.app",
+        messagingSenderId: "747647868200",
+        appId: "1:747647868200:web:6bcba84a0b48dda9be841d",
+        measurementId: "G-BBJLFHPW6J"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const dbRT = getDatabase(app);
+      
+      // Recuperar el nombre de usuario que se almacenó en localStorage (desde el login)
+      const username = localStorage.getItem("username");
+      if (!username) {
+        alert("No se encontró usuario. Por favor, inicia sesión nuevamente.");
+        window.location.href = "index.html"; // o el nombre de tu página de login
+      }
+      
+      // Datos iniciales del inventario (por defecto) - ahora almacenamos solo disponible y máximo
+      let inventoryData = {
+        fungicidas: {
+          name: 'Fungicidas',
+          icon: '🍄',
+          available: 15,
+          max: 80,
+          unit: 'Pallets',
+          lastUpdated: new Date().toLocaleString('es-ES')
+        },
+        insecticidas: {
+          name: 'Insecticidas',
+          icon: '🦗',
+          available: 18,
+          max: 80,
+          unit: 'Pallets',
+          lastUpdated: new Date().toLocaleString('es-ES')
+        },
+        herbicidas: {
+          name: 'Herbicidas',
+          icon: '🌿',
+          available: 52,
+          max: 100,
+          unit: 'Pallets',
+          lastUpdated: new Date().toLocaleString('es-ES')
+        },
+        aceites: {
+          name: 'Aceites',
+          icon: '🛢️',
+          available: 12,
+          max: 50,
+          unit: 'Pallets',
+          lastUpdated: new Date().toLocaleString('es-ES')
+        },
+        foliares: {
+          name: 'Foliares',
+          icon: '🌱',
+          available: 8,
+          max: 40,
+          unit: 'Pallets',
+          lastUpdated: new Date().toLocaleString('es-ES')
+        }
+      };
+      
+      // Referencia a la ruta del inventario para este usuario
+      const userInvRef = ref(dbRT, "usuarios/" + username + "/inventory");
+      
+      // Intentar recuperar la información del inventario del usuario desde Firebase
+      get(userInvRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            console.log("Inventario encontrado para el usuario:", username);
+            inventoryData = snapshot.val();
+            renderInventory();
+          } else {
+            // Si no existe, crea el inventario con datos por defecto
+            set(userInvRef, inventoryData)
+              .then(() => {
+                console.log("Inventario por defecto creado para el usuario:", username);
+                renderInventory();
+              })
+              .catch((error) => {
+                console.error("Error al guardar el inventario por defecto:", error);
+                renderInventory();
+              });
+          }
+        })
+        .catch((error) => {
+          console.error("Error al recuperar el inventario:", error);
+          renderInventory(); // Aún renderiza con el inventario por defecto
+        });
+      
+      // Funciones de utilidad - ahora basadas en disponible vs máximo
+      function getAvailabilityPercentage(available, max) {
+        return (available / max) * 100;
+      }
+      
+      function getStatusClass(percentage) {
+        if (percentage >= 50) return 'status-high';
+        if (percentage >= 25) return 'status-medium';
+        return 'status-low';
+      }
+      
+      function getStatusText(percentage) {
+        if (percentage >= 50) return 'Amplio';
+        if (percentage >= 25) return 'Moderado';
+        return 'Limitado';
+      }
+      
+      // Función para generar el HTML de cada tarjeta
+      function createCategoryCard(key, data) {
+        const percentage = getAvailabilityPercentage(data.available, data.max);
+      
+        return `
+          <div class="category-card ${key}">
+            <div class="category-header">
+              <div class="category-icon">${data.icon}</div>
+              <div class="category-title">${data.name}</div>
+            </div>
+      
+            <div class="space-info">
+              <div class="space-display">${data.available} ${data.unit}</div>
+              <div class="space-label">Espacio Disponible</div>
+              <div class="capacity-info">Capacidad máxima: ${data.max} ${data.unit}</div>
+      
+              <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                <span class="status-indicator ${getStatusClass(percentage)}">
+                  ${getStatusText(percentage)}
+                </span>
+              </div>
+            </div>
+      
+            <div class="edit-controls">
+              <div class="input-group">
+                <input type="number" 
+                       id="input-${key}" 
+                       placeholder="Espacio disponible"
+                       value="${data.available}"
+                       min="0" 
+                       max="${data.max}">
+              </div>
+              <button class="btn btn-update" onclick="updateInventory('${key}')">
+                Actualizar
+              </button>
+            </div>
+      
+            <div class="last-updated">
+              Última actualización: ${data.lastUpdated}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Función para renderizar el inventario en la página
+      function renderInventory() {
+        const grid = document.getElementById('inventoryGrid');
+        grid.innerHTML = '';
+      
+        Object.keys(inventoryData).forEach(key => {
+          grid.innerHTML += createCategoryCard(key, inventoryData[key]);
+        });
+      }
+      
+      // Función para actualizar el inventario y guardar la información en Firebase
+      function updateInventory(category) {
+        const input = document.getElementById(`input-${category}`);
+        const newValue = parseInt(input.value);
+      
+        if (isNaN(newValue) || newValue < 0 || newValue > inventoryData[category].max) {
+          alert(`Por favor ingrese un valor válido entre 0 y ${inventoryData[category].max}`);
+          return;
+        }
+      
+        // Actualizar los datos locales
+        inventoryData[category].available = newValue;
+        inventoryData[category].lastUpdated = new Date().toLocaleString('es-ES');
+        renderInventory();
+      
+        // Notificar al usuario que la actualización fue exitosa
+        showNotification(`${inventoryData[category].name} actualizado correctamente`);
+      
+        // Guardar la actualización en Firebase en la ruta específica de este usuario
+        updateFirebaseInventory(category, inventoryData[category]);
+      }
+      
+      // Función para guardar la información actualizada en Firebase
+      async function updateFirebaseInventory(category, data) {
+        try {
+          await set(ref(dbRT, "usuarios/" + username + "/inventory/" + category), data);
+          console.log(`Datos de ${category} guardados correctamente en RTDB para el usuario ${username}`);
+        } catch (error) {
+          console.error("Error al guardar en RTDB:", error);
+        }
+      }
+      
+      // Función para mostrar notificaciones simples
+      function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #27ae60, #2ecc71);
+          color: white;
+          padding: 15px 25px;
+          border-radius: 10px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+          font-weight: 600;
+          transform: translateX(100%);
+          transition: transform 0.3s ease;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => { 
+          notification.style.transform = 'translateX(0)'; 
+        }, 100);
+        setTimeout(() => {
+          notification.style.transform = 'translateX(100%)';
+          setTimeout(() => { 
+            document.body.removeChild(notification); 
+          }, 300);
+        }, 300);
+      }
+      
+      // Permitir actualización con la tecla "Enter"
+      document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target.type === 'number') {
+          const category = e.target.id.replace('input-', '');
+          updateInventory(category);
+        }
+      });
+      
+      // Exponer la función globalmente para que se pueda usar desde el HTML (por si se necesita)
+      window.updateInventory = updateInventory;
+    </script>
+  </body>
+</html>

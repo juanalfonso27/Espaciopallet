@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Inventario - Depósito</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            50% { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .update-time {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-selector {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            z-index: 2;
+        }
+
+        .user-selector select {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-selector select:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .current-user {
+            color: #3498db;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .inventory-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            border-left: 6px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-card:hover::before {
+            opacity: 0.5;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .fungicidas { border-left-color: #e74c3c; color: #e74c3c; }
+        .insecticidas { border-left-color: #f39c12; color: #f39c12; }
+        .herbicidas { border-left-color: #27ae60; color: #27ae60; }
+        .aceites { border-left-color: #9b59b6; color: #9b59b6; }
+        .foliares { border-left-color: #3498db; color: #3498db; }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 1.8rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: iconShine 4s infinite;
+        }
+
+        @keyframes iconShine {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .fungicidas .category-icon { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .insecticidas .category-icon { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .herbicidas .category-icon { background: linear-gradient(135deg, #27ae60, #229954); }
+        .aceites .category-icon { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .foliares .category-icon { background: linear-gradient(135deg, #3498db, #2980b9); }
+
+        .category-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .space-available {
+            text-align: center;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .available-number {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+
+        .available-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .status-badge::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: badgeShine 3s infinite;
+        }
+
+        @keyframes badgeShine {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .status-high { 
+            background: linear-gradient(135deg, #d5f4e6, #a8e6cf); 
+            color: #27ae60; 
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        .status-medium { 
+            background: linear-gradient(135deg, #fef9e7, #f7dc6f); 
+            color: #f39c12; 
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+        .status-low { 
+            background: linear-gradient(135deg, #fadbd8, #f5b7b1); 
+            color: #e74c3c; 
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .last-updated {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 3px solid currentColor;
+        }
+
+        .update-time-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .update-timestamp {
+            font-size: 0.85rem;
+            color: #495057;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .update-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse-dot 2s infinite;
+        }
+
+        .update-fresh { background-color: #27ae60; }
+        .update-recent { background-color: #f39c12; }
+        .update-old { background-color: #e74c3c; }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .loading-indicator {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .inventory-display {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .inventory-display {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .available-number {
+                font-size: 2.5rem;
+            }
+
+            .user-selector {
+                position: relative;
+                margin-bottom: 20px;
+                top: auto;
+                left: auto;
+            }
+
+            .category-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="user-selector">
+                <select id="userSelect">
+                    <option value="juan">👨‍💼 Juan</option>
+                    <option value="benjamin">👨‍🔧 Benjamín</option>
+                    <option value="jonny">👨‍💻 Jonny</option>
+                    <option value="cleder">👨‍🌾 Cleder</option>
+                    <option value="ariel">👨‍⚕️ Ariel</option>
+                    <option value="lucio">👨‍🎓 Lucio</option>
+                </select>
+            </div>
+            
+            <div class="update-time" id="updateTime">
+                🔄 Actualizando...
+            </div>
+            
+            <h1>📊 Estado del Inventario</h1>
+            <p>Monitoreo en Tiempo Real del Depósito</p>
+            <div class="current-user">Usuario: <span id="currentUserName">Juan</span></div>
+        </div>
+
+        <div class="inventory-display" id="inventoryDisplay">
+            <!-- Las tarjetas se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <div>Cambiando usuario...</div>
+    </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+  // Asegúrate de reemplazar la URL por la correcta de tu base de datos de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCODzFUSe34wHq8-m5taiFjKyEKfg5uZuU",
+    authDomain: "espaciodeposito.firebaseapp.com",
+    databaseURL: "https://espaciodeposito-default-rtdb.firebaseio.com", // Agregada la URL de la base de datos
+    projectId: "espaciodeposito",
+    storageBucket: "espaciodeposito.appspot.com",
+    messagingSenderId: "747647868200",
+    appId: "1:747647868200:web:6bcba84a0b48dda9be841d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const dbRT = getDatabase(app);
+
+  // Lista de usuarios disponibles y categorías
+  const users = ['Juan', 'benjamin', 'jonny', 'cleder', 'ariel', 'lucio'];
+  const categories = ['fungicidas', 'insecticidas', 'herbicidas', 'aceites', 'foliares'];
+
+  // Variables globales
+  let currentUserView = 'juan'; // Usuario por defecto
+  let activeListeners = {}; // Manejo de listeners activos
+  let currentData = {}; // Datos actuales
+
+  // Elementos del DOM
+  const userSelect = document.getElementById('userSelect');
+  const currentUserName = document.getElementById('currentUserName');
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  const updateTimeElement = document.getElementById('updateTime');
+
+  // Inicialización
+  init();
+
+  function init() {
+    userSelect.value = currentUserView;
+    updateCurrentUserDisplay();
+    userSelect.addEventListener('change', handleUserChange);
+    switchToUser(currentUserView);
+    updateTimeDisplay();
+    setInterval(updateTimeDisplay, 1000);
+  }
+
+  function handleUserChange(event) {
+    const newUser = event.target.value;
+    if (newUser !== currentUserView) {
+      showLoading();
+      switchToUser(newUser);
+    }
+  }
+
+  function switchToUser(username) {
+    stopAllListeners();
+    currentData = {};
+    clearInventoryDisplay();
+    currentUserView = username;
+    updateCurrentUserDisplay();
+    setTimeout(() => {
+      listenToUserInventory(username);
+      hideLoading();
+    }, 500);
+  }
+
+  // Ahora se llama a la función de desuscripción para cada listener
+  function stopAllListeners() {
+    Object.keys(activeListeners).forEach(key => {
+      if (typeof activeListeners[key] === 'function') {
+        activeListeners[key]();
+      }
+    });
+    activeListeners = {};
+  }
+
+  function updateCurrentUserDisplay() {
+    currentUserName.textContent = capitalizeFirstLetter(currentUserView);
+    userSelect.value = currentUserView;
+  }
+
+  function showLoading() {
+    loadingIndicator.style.display = 'block';
+  }
+
+  function hideLoading() {
+    loadingIndicator.style.display = 'none';
+  }
+
+  function clearInventoryDisplay() {
+    document.getElementById("inventoryDisplay").innerHTML = '';
+  }
+
+  function listenToUserInventory(username) {
+    console.log(`Iniciando listeners para el usuario: ${username}`);
+    
+    // Primero crear las tarjetas con datos por defecto
+    categories.forEach(category => {
+      const defaultData = {
+        name: capitalizeFirstLetter(category),
+        available: 0,
+        max: 0,
+        icon: getDefaultIcon(category),
+        lastUpdated: new Date().toISOString()
+      };
+      currentData[category] = defaultData;
+      updateCategoryDisplay(category, defaultData);
+    });
+    
+    // Configurar los listeners y almacenar la función de desuscripción
+    categories.forEach(category => {
+      const categoryRef = ref(dbRT, `usuarios/${username}/inventory/${category}`);
+      const unsubscribe = onValue(categoryRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          console.log(`Datos de ${username}/${category}:`, data);
+          currentData[category] = data;
+          updateCategoryDisplay(category, data);
+        } else {
+          console.log(`No hay datos para ${username}/${category}, inicializando...`);
+          const defaultData = {
+            name: capitalizeFirstLetter(category),
+            available: 0,
+            max: 0,
+            icon: getDefaultIcon(category),
+            lastUpdated: new Date().toISOString()
+          };
+          currentData[category] = defaultData;
+          set(categoryRef, defaultData);
+          updateCategoryDisplay(category, defaultData);
+        }
+      }, (error) => {
+        console.error(`Error listening to ${username}/${category}:`, error);
+        const defaultData = {
+          name: capitalizeFirstLetter(category),
+          available: 0,
+          max: 0,
+          icon: getDefaultIcon(category),
+          lastUpdated: new Date().toISOString()
+        };
+        currentData[category] = defaultData;
+        updateCategoryDisplay(category, defaultData);
+      });
+      // Guarda la función de cancelación para poder detener el listener
+      activeListeners[`${username}_${category}`] = unsubscribe;
+    });
+  }
+
+  function getDefaultIcon(category) {
+    const icons = {
+      fungicidas: "🍄",
+      insecticidas: "🐛",
+      herbicidas: "🌿",
+      aceites: "🛢️",
+      foliares: "🌱"
+    };
+    return icons[category] || "📦";
+  }
+
+  function getStatusClass(available, max) {
+    if (max === 0) return 'status-low';
+    const percentage = (available / max) * 100;
+    if (percentage >= 70) return 'status-high';
+    if (percentage >= 30) return 'status-medium';
+    return 'status-low';
+  }
+
+  function getStatusText(available, max) {
+    if (max === 0) return 'Sin configurar';
+    const percentage = (available / max) * 100;
+    if (percentage >= 70) return 'ALTO';
+    if (percentage >= 30) return 'MEDIO';
+    return 'BAJO';
+  }
+
+  // Función para actualizar la tarjeta de cada categoría
+  function updateCategoryDisplay(category, data) {
+    const container = document.getElementById("inventoryDisplay");
+    let categoryElement = container.querySelector(`.${category}`);
+    if (!categoryElement) {
+      categoryElement = document.createElement("div");
+      categoryElement.classList.add("category-card", category);
+      container.appendChild(categoryElement);
+    }
+    
+    const lastUpdatedInfo = formatLastUpdated(data.lastUpdated);
+    const statusClass = getStatusClass(data.available, data.max);
+    const statusText = getStatusText(data.available, data.max);
+    
+    categoryElement.innerHTML = `
+      <div class="category-header">
+        <div class="category-icon">${data.icon}</div>
+        <div class="category-title">${data.name}</div>
+      </div>
+      
+      <div class="space-available">
+        <div class="available-label">Espacios Disponibles</div>
+        <div class="available-number">${data.available}</div>
+        <div class="status-badge ${statusClass}">${statusText}</div>
+      </div>
+      
+      <div class="last-updated">
+        <div class="update-time-text">
+          <span class="update-indicator ${lastUpdatedInfo.class}"></span>
+          Última actualización:
+        </div>
+        <div class="update-timestamp">${lastUpdatedInfo.formatted}</div>
+      </div>
+    `;
+  }
+
+  function updateTimeDisplay() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    updateTimeElement.innerHTML = `🔄 ${timeString}`;
+  }
+
+  function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function formatLastUpdated(lastUpdated) {
+    if (!lastUpdated) {
+      return { formatted: 'Sin datos', class: 'update-old' };
+    }
+    const now = new Date();
+    const updateTimeObj = new Date(lastUpdated);
+    const diffInMinutes = Math.floor((now - updateTimeObj) / (1000 * 60));
+    let formatted, className;
+    if (diffInMinutes < 1) {
+      formatted = "Hace unos segundos";
+      className = "update-fresh";
+    } else if (diffInMinutes < 5) {
+      formatted = `Hace ${diffInMinutes} min`;
+      className = "update-fresh";
+    } else if (diffInMinutes < 30) {
+      formatted = `Hace ${diffInMinutes} min`;
+      className = "update-recent";
+    } else if (diffInMinutes < 60) {
+      formatted = `Hace ${diffInMinutes} min`;
+      className = "update-old";
+    } else if (diffInMinutes < 1440) {
+      const hours = Math.floor(diffInMinutes / 60);
+      formatted = `Hace ${hours}h ${diffInMinutes % 60}min`;
+      className = "update-old";
+    } else {
+      formatted = updateTimeObj.toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                  }) + " " +
+                  updateTimeObj.toLocaleTimeString("es-ES", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                  });
+      className = "update-old";
+    }
+    return { formatted, class: className };
+  }
+
+  // Actualizar las tarjetas cada 30 segundos para refrescar los tiempos relativos
+  setInterval(() => {
+    Object.keys(currentData).forEach(category => {
+      if (currentData[category]) {
+        updateCategoryDisplay(category, currentData[category]);
+      }
+    });
+  }, 30000);
+
+  // Funciones globales para facilitar la depuración
+  window.switchToUser = switchToUser;
+  window.getCurrentData = () => currentData;
+  window.getCurrentUser = () => currentUserView;
+</script>
+
+
+</body>
+</html>
