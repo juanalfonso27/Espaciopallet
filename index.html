@@ -11,14 +11,17 @@
   margin: 0;
   padding: 0;
 }
+
 /* Altura completa en html y body */
 html, body {
   height: 100%;
 }
+
 /* Fondo y centrado general */
 body {
   font-family: Arial, sans-serif;
-  background-color: #F0F1FE;
+   background-color:#F0F1FE;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,46 +29,46 @@ body {
   padding: 20px;
   color: #fff;
 }
+
 /* Título de la página */
 h1 {
-  color: black;
+    color: black;
   font-size: 2rem;
   text-align: center;
   margin-bottom: 20px;
   line-height: 1.2;
 }
-/* Formulario: fondo azul con bordes redondeados */
+
+/* Formulario: fondo blanco semi-transparente con bordes redondeados y sombra */
 form {
-  background-color: #001f3f; /* Tonos azules profundos */
+  background-color:  #001f3f; /* Tonos azules profundos */
   padding: 30px;
   width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-      width: 100%;
   max-width: 400px;
   border-radius: 12px;
   
   display: flex;
   flex-direction: column;
 }
-/* Logo principal (logo1.png) - más pequeño */
-#logo1 {
-  background-color: #001f3f;
+
+/* Imágenes dentro del formulario: centradas, con sutil sombra para realzar los logos */
+#miImagen {
+    background-color:  #001f3f;  /* Tonos azules profundos */
   display: block;
   margin: 0 auto 20px;
-  max-width: 80%; /* Reducido de 80% a 60% */
+  max-width: 80%;
   border-radius: 8px;
+
 }
-/* Logo secundario (logo2.png) */
-#logo2 {
-  padding: 2%;
-  align-self: center;
-  width: 130%;
+#miImagen2 {
+   padding: 2%;
+   align-self: center;
+    width: 130%;
 }
-/* Inputs: ocupan todo el ancho */
+
+/* Inputs: ocupan todo el ancho con detalles sutiles */
 input {
+    
   width: 100%;
   padding: 12px;
   font-size: 16px;
@@ -73,10 +76,12 @@ input {
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-/* Botones: estilo consistente */
+
+/* Botón: tono teal armónico que contrasta y armoniza con el fondo azul */
 button {
   width: 100%;
   padding: 12px;
+  background-color: #20c997;  /* Teal fresco */
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -84,28 +89,19 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-bottom: 10px;
 }
-/* Botón de login - color teal */
-.btn-login {
-  background-color: #20c997;
-}
-.btn-login:hover {
+
+button:hover {
   background-color: #1aa179;
 }
-/* Botón de registro - color más claro */
-.btn-register {
-  background-color: #6c757d;
-}
-.btn-register:hover {
-  background-color: #5a6268;
-}
+
 /* Media Query para pantallas pequeñas */
 @media (max-width: 480px) {
   h1 {
     font-size: 1.5rem;
     margin-bottom: 15px;
   }
+
   form {
     padding: 20px;
   }
@@ -113,10 +109,6 @@ button {
   input, button {
     font-size: 14px;
     padding: 10px;
-  }
-  
-  #logo1 {
-    max-width: 50%; /* Aún más pequeño en móviles */
   }
 }
     </style>
