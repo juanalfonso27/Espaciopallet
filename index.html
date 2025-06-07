@@ -11,12 +11,10 @@
   margin: 0;
   padding: 0;
 }
-
 /* Altura completa en html y body */
 html, body {
   height: 100%;
 }
-
 /* Fondo y centrado general */
 body {
   font-family: Arial, sans-serif;
@@ -28,7 +26,6 @@ body {
   padding: 20px;
   color: #fff;
 }
-
 /* Título de la página */
 h1 {
   color: black;
@@ -37,7 +34,6 @@ h1 {
   margin-bottom: 20px;
   line-height: 1.2;
 }
-
 /* Formulario: fondo azul con bordes redondeados */
 form {
   background-color: #001f3f; /* Tonos azules profundos */
@@ -48,24 +44,20 @@ form {
   display: flex;
   flex-direction: column;
 }
-
-/* Logo principal (logo1.png) */
-#miImagen {
+/* Logo principal (logo1.png) - más pequeño */
+#logo1 {
   background-color: #001f3f;
   display: block;
   margin: 0 auto 20px;
-  max-width: 80%;
+  max-width: 80%; /* Reducido de 80% a 60% */
   border-radius: 8px;
 }
-
 /* Logo secundario (logo2.png) */
-#miImagen2 {
+#logo2 {
   padding: 2%;
   align-self: center;
   width: 130%;
-  margin-top: 15px;
 }
-
 /* Inputs: ocupan todo el ancho */
 input {
   width: 100%;
@@ -75,7 +67,6 @@ input {
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-
 /* Botones: estilo consistente */
 button {
   width: 100%;
@@ -89,32 +80,26 @@ button {
   transition: background-color 0.3s ease;
   margin-bottom: 10px;
 }
-
 /* Botón de login - color teal */
 .btn-login {
   background-color: #20c997;
 }
-
 .btn-login:hover {
   background-color: #1aa179;
 }
-
 /* Botón de registro - color más claro */
 .btn-register {
   background-color: #6c757d;
 }
-
 .btn-register:hover {
   background-color: #5a6268;
 }
-
 /* Media Query para pantallas pequeñas */
 @media (max-width: 480px) {
   h1 {
     font-size: 1.5rem;
     margin-bottom: 15px;
   }
-
   form {
     padding: 20px;
   }
@@ -123,10 +108,13 @@ button {
     font-size: 14px;
     padding: 10px;
   }
+  
+  #logo1 {
+    max-width: 50%; /* Aún más pequeño en móviles */
+  }
 }
     </style>
 </head>
-
 <body>
     <h1>Inicie sesión</h1>
     <form id="loginForm">
