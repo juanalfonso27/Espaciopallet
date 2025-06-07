@@ -4,456 +4,279 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión - 7 Unidades</title>
-    <link rel="manifest" href="/manifest.json">
-
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* Reset global */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            min-height: 100vh;
-        }
+/* Altura completa en html y body */
+html, body {
+  height: 100%;
+}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+/* Fondo y centrado general */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #F0F1FE;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #fff;
+}
 
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            margin-bottom: 20px;
-        }
+/* Título de la página */
+h1 {
+  color: black;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
 
-        .header {
-            background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 16px 0;
-            margin-bottom: 24px;
-        }
+/* Formulario: fondo azul con bordes redondeados */
+form {
+  background-color: #001f3f; /* Tonos azules profundos */
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* Logo principal (logo1.png) */
+#miImagen {
+  background-color: #001f3f;
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 80%;
+  border-radius: 8px;
+}
 
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+/* Logo secundario (logo2.png) */
+#miImagen2 {
+  padding: 2%;
+  align-self: center;
+  width: 130%;
+  margin-top: 15px;
+}
 
-        .header-title h1 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #111827;
-        }
+/* Inputs: ocupan todo el ancho */
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
 
-        .header-subtitle {
-            font-size: 14px;
-            color: #6b7280;
-        }
+/* Botones: estilo consistente */
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+}
 
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 16px;
-        }
+/* Botón de login - color teal */
+.btn-login {
+  background-color: #20c997;
+}
 
-        .login-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 32px;
-            width: 100%;
-            max-width: 400px;
-        }
+.btn-login:hover {
+  background-color: #1aa179;
+}
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+/* Botón de registro - color más claro */
+.btn-register {
+  background-color: #6c757d;
+}
 
-        .login-header h1 {
-            font-size: 24px;
-            font-weight: bold;
-            color: #111827;
-            margin-bottom: 8px;
-        }
+.btn-register:hover {
+  background-color: #5a6268;
+}
 
-        .login-header p {
-            color: #6b7280;
-        }
+/* Media Query para pantallas pequeñas */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #4f46e5;
-            color: white;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .btn-primary:hover {
-            background: #4338ca;
-        }
-
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-
-        .grid {
-            display: grid;
-            gap: 24px;
-        }
-
-        .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        }
-
-        .grid-3 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-
-        .unit-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 4px solid #4f46e5;
-        }
-
-        .unit-card:hover {
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .unit-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .unit-number {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .unit-name {
-            font-size: 16px;
-            font-weight: 500;
-            color: #4f46e5;
-            margin-bottom: 12px;
-        }
-
-        .unit-info {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .read-only {
-            background: #f9fafb;
-            color: #374151;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-        }
-
-        .info-card {
-            background: #f9fafb;
-            border-radius: 6px;
-            padding: 16px;
-            margin-top: 24px;
-        }
-
-        .info-card p {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .info-card strong {
-            color: #374151;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .icon {
-            width: 20px;
-            height: 20px;
-            color: currentColor;
-        }
-
-        .icon-lg {
-            width: 48px;
-            height: 48px;
-            color: #4f46e5;
-            margin: 0 auto 16px;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mb-8 {
-            margin-bottom: 32px;
-        }
-
-        .mt-8 {
-            margin-top: 32px;
-        }
-
-        .flex-end {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        @media (max-width: 768px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-            
-            .grid-3 {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                gap: 12px;
-            }
-        }
+  form {
+    padding: 20px;
+  }
+  
+  input, button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
     </style>
 </head>
 
- <body>
-    <!-- Pantalla de Login/Registro -->
-    <div id="loginScreen" class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <i data-lucide="building" class="icon-lg"></i>
-          <h1>Sistema de Gestión</h1>
-          <p>7 Unidades Organizacionales</p>
-        </div>
+<body>
+    <h1>Inicie sesión</h1>
+    <form id="loginForm">
+        <!-- Logo principal -->
+        <img id="miImagen" src="logo1.png" alt="Logo de la página">
         
-        <!-- Campo para el nombre de usuario -->
-        <div class="form-group">
-          <label class="form-label">Nombre de Usuario</label>
-          <input type="text" id="username" class="form-input" placeholder="Nombre de usuario">
-        </div>
+        <!-- Campos de entrada -->
+        <input type="text" id="username" placeholder="Nombre de usuario" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
         
-        <!-- Campo para la contraseña -->
-        <div class="form-group">
-          <label class="form-label">Contraseña</label>
-          <input type="password" id="password" class="form-input" placeholder="Ingresa tu contraseña">
-        </div>
+        <!-- Botones -->
+        <button type="button" onclick="login()" class="btn-login">Iniciar Sesión</button>
         
-        <!-- Botón para iniciar sesión -->
-        <button onclick="login()" class="btn btn-primary">Iniciar Sesión</button>
-        <!-- Botón para registrar una nueva cuenta -->
-         <!-- Código JavaScript como módulo -->
+        <!-- Logo secundario -->
+        <img id="miImagen2" src="logo2.png" alt="Marcas">
+    </form>
+
+<script type="module">
+// Importar módulos necesarios desde Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+// Configuración de Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCODzFUSe34wHq8-m5taiFjKyEKfg5uZuU",
+  authDomain: "espaciodeposito.firebaseapp.com",
+  projectId: "espaciodeposito",
+  storageBucket: "espaciodeposito.firebasestorage.app",
+  messagingSenderId: "747647868200",
+  appId: "1:747647868200:web:6bcba84a0b48dda9be841d",
+  measurementId: "G-BBJLFHPW6J"
+};
+
+// Inicializar Firebase, Analytics y Realtime Database
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const dbRT = getDatabase(app);
+
+// Función para registrar usuario
+function createAccount() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
   
-    <!-- Vista de Visualización (opcional, en caso de usarla en otro flujo) -->
-    <div id="visualizadorScreen" class="hidden">
-      <div class="header">
-        <div class="header-content">
-          <div class="header-title">
-            <i data-lucide="users" class="icon"></i>
-            <div>
-              <h1>Panel de Visualización</h1>
-              <p class="header-subtitle" id="visualizadorSubtitle">Usuario:</p>
-            </div>
-          </div>
-          <button onclick="logout()" class="btn btn-secondary">
-            <i data-lucide="log-out" class="icon"></i>
-            Cerrar Sesión
-          </button>
-        </div>
-      </div>
-      <!-- Aquí puedes agregar más contenido del panel -->
-    </div>
-    
-  <script type="module">
-  // Importar módulos necesarios desde Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
-  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
-  
-  // Configuración de Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyCODzFUSe34wHq8-m5taiFjKyEKfg5uZuU",
-    authDomain: "espaciodeposito.firebaseapp.com",
-    projectId: "espaciodeposito",
-    storageBucket: "espaciodeposito.firebasestorage.app",
-    messagingSenderId: "747647868200",
-    appId: "1:747647868200:web:6bcba84a0b48dda9be841d",
-    measurementId: "G-BBJLFHPW6J"
-  };
-  
-  // Inicializar Firebase, Analytics y Realtime Database
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const dbRT = getDatabase(app);
-  
-  // Función para registrar usuario: Guarda en la DB un objeto con username y password
-  function createAccount() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    
-    if (!username || !password) {
-      alert('Por favor, ingresa un nombre de usuario y contraseña.');
-      return;
-    }
-    
-    // Crear una referencia para el usuario usando el username
-    const userRef = ref(dbRT, "usuarios/" + username);
-    
-    // Verificar si el usuario ya existe
-    get(userRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          alert("El nombre de usuario ya existe. Por favor, elige otro.");
-        } else {
-          // Guarda el usuario en la base de datos
-          set(userRef, {
-            username: username,
-            password: password
-          })
-          .then(() => {
-            alert('Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
-          })
-          .catch((error) => {
-            console.error("Error al registrar usuario:", error);
-            alert("Error al registrar usuario.");
-          });
-        }
-      })
-      .catch((error) => {
-        console.error("Error verificando usuario:", error);
-        alert("Hubo un error, inténtalo de nuevo.");
-      });
+  if (!username || !password) {
+    alert('Por favor, ingresa un nombre de usuario y contraseña.');
+    return;
   }
   
-  // Función para iniciar sesión: Verifica que el usuario y contraseña coincidan
-  function login() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    
-    if (!username || !password) {
-      alert('Por favor, ingresa tu nombre de usuario y contraseña.');
-      return;
-    }
-    
-    const userRef = ref(dbRT, "usuarios/" + username);
-    
-    get(userRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          if (userData.password === password) {
-            // Almacenar el nombre de usuario en localStorage para uso en la otra página
-            localStorage.setItem("username", username);
-            
-            // Redireccionar según el nombre de usuario:
-            // Si es pablo, fatima, jeanne o sussan, redirige a "para ver el espacio.html".
-            // Caso contrario, a "paracambiarlosdatos.html".
-            const lowerUsername = username.toLowerCase();
-            if (["pablo", "fatima", "jeanne", "sussan"].includes(lowerUsername)) {
-              window.location.href = "para ver el espacio.html";
-            } else {
-              window.location.href = "paracambiarlosdatos.html";
-            }
+  // Crear una referencia para el usuario usando el username
+  const userRef = ref(dbRT, "usuarios/" + username);
+  
+  // Verificar si el usuario ya existe
+  get(userRef)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        alert("El nombre de usuario ya existe. Por favor, elige otro.");
+      } else {
+        // Guarda el usuario en la base de datos
+        set(userRef, {
+          username: username,
+          password: password
+        })
+        .then(() => {
+          alert('Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
+          // Limpiar los campos después del registro exitoso
+          document.getElementById('username').value = '';
+          document.getElementById('password').value = '';
+        })
+        .catch((error) => {
+          console.error("Error al registrar usuario:", error);
+          alert("Error al registrar usuario.");
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error verificando usuario:", error);
+      alert("Hubo un error, inténtalo de nuevo.");
+    });
+}
+
+// Función para iniciar sesión
+function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  
+  if (!username || !password) {
+    alert('Por favor, ingresa tu nombre de usuario y contraseña.');
+    return;
+  }
+  
+  const userRef = ref(dbRT, "usuarios/" + username);
+  
+  get(userRef)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (userData.password === password) {
+          // Redireccionar según el nombre de usuario:
+          // Si es pablo, fatima, jeanne o sussan, redirige a "para ver el espacio.html".
+          // Caso contrario, a "paracambiarlosdatos.html".
+          const lowerUsername = username.toLowerCase();
+          if (["pablo", "fatima", "jeanne", "sussan"].includes(lowerUsername)) {
+            window.location.href = "para ver el espacio.html";
           } else {
-            alert("Contraseña incorrecta");
+            window.location.href = "paracambiarlosdatos.html";
           }
         } else {
-          alert("Usuario no encontrado");
+          alert("Contraseña incorrecta");
         }
+      } else {
+        alert("Usuario no encontrado");
+      }
+    })
+    .catch((error) => {
+      console.error("Error en el login:", error);
+      alert("Error al iniciar sesión.");
+    });
+}
+
+// Exponer las funciones globalmente para ser accesibles desde el HTML
+window.createAccount = createAccount;
+window.login = login;
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('Service Worker registrado con éxito en:', registration.scope);
       })
       .catch((error) => {
-        console.error("Error en el login:", error);
-        alert("Error al iniciar sesión.");
+        console.error('Error al registrar el Service Worker:', error);
       });
+  });
+}
+
+// Opcional: permitir login con Enter
+document.getElementById('password').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    login();
   }
-  
-  // Función para cerrar sesión (en este ejemplo, simplemente vuelve a la pantalla de login)
-  function logout() {
-    document.getElementById('loginScreen').classList.remove("hidden");
-    document.getElementById('visualizadorScreen').classList.add("hidden");
+});
+
+document.getElementById('username').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    login();
   }
-  
-  // Exponer las funciones globalmente para ser accesibles desde el HTML
-  window.createAccount = createAccount;
-  window.login = login;
-  window.logout = logout;
+});
 </script>
 
-  </body>
+</body>
 </html>
