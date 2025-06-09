@@ -1,7 +1,7 @@
 {
   "name": "Espacio pallet",
   "short_name": "Esp.pallet",
-  "start_url": "/https://espaciopallet.vercel.app",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#00b09b",
