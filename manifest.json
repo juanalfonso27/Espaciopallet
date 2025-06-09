@@ -1,14 +1,20 @@
 {
-  "name":"Espacio pallet",
-  "short_name":"Esp.pallet",
-  "start_url":"https://espaciopallet.vercel.app/",
-  "display":"standalone",
-  "background_color":"#ffffff",
-  "theme_color":"#00b09b",
+  "name": "Espacio pallet",
+  "short_name": "Esp.pallet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00b09b",
   "icons": [
     {
-      "src":"logo.png",
-      "sizes":"192x192",
-      "type":"image/png"
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
-   
+    {
+      "src": "logoo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
