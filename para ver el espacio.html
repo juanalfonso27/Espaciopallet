@@ -495,9 +495,9 @@
     }, 500);
   }
 
-  // Ahora se llama a la función de desuscripción para cada listener
+  // Función para detener todos los listeners activos
   function stopAllListeners() {
-    Object.keys(activeListeners).forEach(key => {
+    Object.keys(activeListeners).forEach((key) => {
       if (typeof activeListeners[key] === 'function') {
         activeListeners[key]();
       }
@@ -632,7 +632,6 @@
       
       <div class="last-updated">
         <div class="update-time-text">
-          <span class="update-indicator ${lastUpdatedInfo.class}"></span>
           Última actualización:
         </div>
         <div class="update-timestamp">${lastUpdatedInfo.formatted}</div>
@@ -654,60 +653,41 @@
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
+  // Nueva función para formatear la hora exacta usando la zona horaria "America/Asuncion"
   function formatLastUpdated(lastUpdated) {
     if (!lastUpdated) {
       return { formatted: 'Sin datos', class: 'update-old' };
     }
-    const now = new Date();
     const updateTimeObj = new Date(lastUpdated);
-    const diffInMinutes = Math.floor((now - updateTimeObj) / (1000 * 60));
-    let formatted, className;
-    if (diffInMinutes < 1) {
-      formatted = "Hace unos segundos";
-      className = "update-fresh";
-    } else if (diffInMinutes < 5) {
-      formatted = `Hace ${diffInMinutes} min`;
-      className = "update-fresh";
-    } else if (diffInMinutes < 30) {
-      formatted = `Hace ${diffInMinutes} min`;
-      className = "update-recent";
-    } else if (diffInMinutes < 60) {
-      formatted = `Hace ${diffInMinutes} min`;
-      className = "update-old";
-    } else if (diffInMinutes < 1440) {
-      const hours = Math.floor(diffInMinutes / 60);
-      formatted = `Hace ${hours}h ${diffInMinutes % 60}min`;
-      className = "update-old";
-    } else {
-      formatted = updateTimeObj.toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
-                  }) + " " +
-                  updateTimeObj.toLocaleTimeString("es-ES", {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  });
-      className = "update-old";
-    }
-    return { formatted, class: className };
+    const formatted = updateTimeObj.toLocaleDateString("es-ES", {
+                      timeZone: "America/Asuncion",
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric"
+                    }) + " " +
+                    updateTimeObj.toLocaleTimeString("es-ES", {
+                      timeZone: "America/Asuncion",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit"
+                    });
+    return { formatted, class: "update-old" };
   }
 
-  // Actualizar las tarjetas cada 30 segundos para refrescar los tiempos relativos
+  // Actualizar las tarjetas cada 5 segundos para refrescar la hora exacta
   setInterval(() => {
     Object.keys(currentData).forEach(category => {
       if (currentData[category]) {
         updateCategoryDisplay(category, currentData[category]);
       }
     });
-  }, 30000);
+  }, 5000);
 
   // Funciones globales para facilitar la depuración
   window.switchToUser = switchToUser;
   window.getCurrentData = () => currentData;
   window.getCurrentUser = () => currentUserView;
 </script>
-
-
 </body>
 </html>
+
