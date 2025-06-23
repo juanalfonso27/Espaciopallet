@@ -14,16 +14,25 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            background-color: #60706E;
             min-height: 100vh;
         }
+          img{
+            width: 80%;
+          }
+         
+       #imagenabajo {
+        width: 140%;
+         margin-left: -20%; /* Ajusto este valor según cuánto quiero moverla */
 
+       
+       }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-
+           
         .card {
             background: white;
             border-radius: 8px;
@@ -74,7 +83,7 @@
         }
 
         .login-card {
-            background: white;
+            background: #60706E;
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 32px;
@@ -95,7 +104,7 @@
         }
 
         .login-header p {
-            color: #6b7280;
+            color: #000000;
         }
 
         .form-group {
@@ -106,7 +115,7 @@
             display: block;
             font-size: 14px;
             font-weight: 500;
-            color: #374151;
+            color: #050404;
             margin-bottom: 8px;
         }
 
@@ -121,8 +130,8 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: #364643;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
 
         .btn {
@@ -139,7 +148,7 @@
         }
 
         .btn-primary {
-            background: #4f46e5;
+            background: #37394C;
             color: white;
             width: 100%;
             justify-content: center;
@@ -297,11 +306,12 @@
  <body>
     <!-- Pantalla de Login/Registro -->
     <div id="loginScreen" class="login-container">
+    
       <div class="login-card">
         <div class="login-header">
           <i data-lucide="building" class="icon-lg"></i>
+            <img src="logo1.png" alt="">
           <h1>Sistema de Gestión</h1>
-          <p>7 Unidades Organizacionales</p>
         </div>
 
         <!-- Campo para el nombre de usuario -->
@@ -318,6 +328,7 @@
 
         <!-- Botón para iniciar sesión -->
         <button onclick="login()" class="btn btn-primary">Iniciar Sesión</button>
+        <img id="imagenabajo" src="logo2.png" alt="s">
         <!-- Botón para registrar una nueva cuenta -->
          <!-- Código JavaScript como módulo -->
 
@@ -340,7 +351,6 @@
       </div>
       <!-- Aquí puedes agregar más contenido del panel -->
     </div>
-
   <script type="module">
   // Importar módulos necesarios desde Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
