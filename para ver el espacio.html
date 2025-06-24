@@ -438,7 +438,7 @@
   const firebaseConfig = {
     apiKey: "AIzaSyCODzFUSe34wHq8-m5taiFjKyEKfg5uZuU",
     authDomain: "espaciodeposito.firebaseapp.com",
-    databaseURL: "https://espaciodeposito-default-rtdb.firebaseio.com", // Agregada la URL de la base de datos
+    databaseURL: "https://espaciodeposito-default-rtdb.firebaseio.com",
     projectId: "espaciodeposito",
     storageBucket: "espaciodeposito.appspot.com",
     messagingSenderId: "747647868200",
@@ -525,7 +525,7 @@
   function listenToUserInventory(username) {
     console.log(`Iniciando listeners para el usuario: ${username}`);
     
-    // Primero crear las tarjetas con datos por defecto
+    // Crear las tarjetas con datos por defecto
     categories.forEach(category => {
       const defaultData = {
         name: capitalizeFirstLetter(category),
@@ -572,7 +572,7 @@
         currentData[category] = defaultData;
         updateCategoryDisplay(category, defaultData);
       });
-      // Guarda la función de cancelación para poder detener el listener
+      // Guarda la función de cancelación para detener el listener
       activeListeners[`${username}_${category}`] = unsubscribe;
     });
   }
@@ -604,7 +604,7 @@
     return 'BAJO';
   }
 
-  // Función para actualizar la tarjeta de cada categoría
+  // Actualiza la tarjeta de cada categoría
   function updateCategoryDisplay(category, data) {
     const container = document.getElementById("inventoryDisplay");
     let categoryElement = container.querySelector(`.${category}`);
@@ -614,6 +614,7 @@
       container.appendChild(categoryElement);
     }
     
+    // Se utiliza la función para "estirar" la hora que viene de Firebase
     const lastUpdatedInfo = formatLastUpdated(data.lastUpdated);
     const statusClass = getStatusClass(data.available, data.max);
     const statusText = getStatusText(data.available, data.max);
@@ -639,6 +640,7 @@
     `;
   }
 
+  // La hora actual en vivo
   function updateTimeDisplay() {
     const now = new Date();
     const timeString = now.toLocaleTimeString('es-ES', {
@@ -653,28 +655,51 @@
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  // Nueva función para formatear la hora exacta usando la zona horaria "America/Asuncion"
+  // Nueva función para formatear el timestamp.
+  // Si el valor de Firebase ya está formateado (e.g. "24/6/2025, 16:22:55"), se utiliza tal cual.
   function formatLastUpdated(lastUpdated) {
     if (!lastUpdated) {
       return { formatted: 'Sin datos', class: 'update-old' };
     }
-    const updateTimeObj = new Date(lastUpdated);
+    // Si el valor contiene "/" asumimos que ya está formateado
+    if (typeof lastUpdated === 'string' && lastUpdated.indexOf("/") !== -1) {
+      return { formatted: lastUpdated, class: 'update-old' };
+    }
+    
+    // Intentamos crear un objeto Date con el valor recibido
+    let updateTimeObj = new Date(lastUpdated);
+    if (isNaN(updateTimeObj.getTime())) {
+      let timestamp = parseInt(lastUpdated, 10);
+      if (!isNaN(timestamp)) {
+        if (timestamp < 10000000000) {  // supuesto timestamp en segundos
+          timestamp *= 1000;
+        }
+        updateTimeObj = new Date(timestamp);
+      }
+    }
+    
+    if (isNaN(updateTimeObj.getTime())) {
+      return { formatted: 'Fecha inválida', class: 'update-old' };
+    }
+    
+    // Si el valor no tenía formato de cadena, lo convertimos a la zona "America/Asuncion"
     const formatted = updateTimeObj.toLocaleDateString("es-ES", {
-                      timeZone: "America/Asuncion",
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric"
-                    }) + " " +
-                    updateTimeObj.toLocaleTimeString("es-ES", {
-                      timeZone: "America/Asuncion",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit"
-                    });
+      timeZone: "America/Asuncion",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    }) + " " +
+    updateTimeObj.toLocaleTimeString("es-ES", {
+      timeZone: "America/Asuncion",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+    
     return { formatted, class: "update-old" };
   }
 
-  // Actualizar las tarjetas cada 5 segundos para refrescar la hora exacta
+  // Actualizar las tarjetas cada 5 segundos (esto refresca la hora de "lastUpdated" si cambia en Firebase)
   setInterval(() => {
     Object.keys(currentData).forEach(category => {
       if (currentData[category]) {
@@ -683,7 +708,7 @@
     });
   }, 5000);
 
-  // Funciones globales para facilitar la depuración
+  // Funciones globales para depuración
   window.switchToUser = switchToUser;
   window.getCurrentData = () => currentData;
   window.getCurrentUser = () => currentUserView;
